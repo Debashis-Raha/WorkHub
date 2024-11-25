@@ -5,6 +5,7 @@ import Header from '../../components/Header';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from 'expo-router';
 
+
 const ScheduleAndAddress = () => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
@@ -97,7 +98,7 @@ const ScheduleAndAddress = () => {
                 />
                 <TouchableOpacity style={styles.payment}>
 
-                    <Text  style={styles.doneButtonText} onPress={()=>navigation.navigate('')}>
+                    <Text  style={styles.doneButtonText} onPress={()=>navigation.navigate('(src)/Profile')}>
                         Send Request
                     </Text>
                 </TouchableOpacity>
