@@ -1,25 +1,73 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-} from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, TextInput } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import Header from "../../components/Header";
 import data from "../../components/Data.json";
 import { useNavigation } from "expo-router";
 
 const Home = () => {
   const navigation = useNavigation();
-  const professionals = data.professionals; // Ensure this is an array
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [filteredProfessionals, setFilteredProfessionals] = useState(data.professionals);
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    filterProfessionals(query, selectedCategory);
+  };
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    filterProfessionals(searchQuery, category);
+  };
+
+  const filterProfessionals = (query, category) => {
+    const filtered = data.professionals.filter((professional) => {
+      const matchesQuery = professional.name.toLowerCase().includes(query.toLowerCase());
+      const matchesCategory = category ? professional.category === category : true;
+      return matchesQuery && matchesCategory;
+    });
+    setFilteredProfessionals(filtered);
+  };
+
+  const categories = Array.from(new Set(data.professionals.map(p => p.category)));
 
   return (
     <View style={styles.container}>
-      <Header />
+      <Header title="Home" />
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search"
+          value={searchQuery}
+          onChangeText={handleSearch}
+        />
+        <Ionicons
+          name="search"
+          size={24}
+          color="#007BFF"
+          style={styles.searchIcon}
+        />
+      </View>
+      <ScrollView horizontal style={styles.categoryContainer} contentContainerStyle={styles.categoryContent}>
+        <TouchableOpacity
+          style={[styles.categoryButton, !selectedCategory && styles.selectedCategory]}
+          onPress={() => handleCategoryChange("")}
+        >
+          <Text style={styles.categoryButtonText}>All</Text>
+        </TouchableOpacity>
+        {categories.map((category, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[styles.categoryButton, selectedCategory === category && styles.selectedCategory]}
+            onPress={() => handleCategoryChange(category)}
+          >
+            <Text style={styles.categoryButtonText}>{category}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
       <ScrollView contentContainerStyle={styles.scrollView}>
-        {professionals.map((item, index) => (
+        {filteredProfessionals.map((item, index) => (
           <TouchableOpacity
             style={styles.box}
             key={index}
@@ -53,6 +101,50 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 10,
+    marginVertical: 5,
+  },
+  searchBar: {
+    flex: 1,
+    height: 40,
+    borderColor: "#007BFF",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingRight: 40, // Add padding to the right to avoid overlap with the icon
+  },
+  searchIcon: {
+    position: "absolute",
+    right: 10, // Adjusted to bring it closer to the TextInput
+    top: "50%",
+    transform: [{ translateY: -12 }],
+  },
+  categoryContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 10,
+    marginVertical: 5,
+    maxHeight: 40,
+  },
+  categoryContent: {
+    alignItems: "center",
+  },
+  categoryButton: {
+    paddingVertical: 5, // Reduced vertical padding
+    paddingHorizontal: 10, // Reduced horizontal padding
+    backgroundColor: "#e0e0e0",
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  selectedCategory: {
+    backgroundColor: "#007BFF",
+  },
+  categoryButtonText: {
+    color: "#333",
+    fontSize: 12, // Reduced font size for a tighter look
   },
   scrollView: {
     paddingVertical: 10,

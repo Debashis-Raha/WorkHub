@@ -10,6 +10,7 @@ import {
 import { Entypo } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 import { useNavigation } from "expo-router";
+import Header from "../../components/Header";
 
 const ProfileScreen = () => {
   const profilePictureUrl =
@@ -41,6 +42,7 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       {/* Top Bar */}
+      <Header title=''/>
       <View style={styles.topBar}>
         <Text style={styles.username}>{item.UserName}</Text>
       </View>
@@ -124,7 +126,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 10,
+    // paddingTop: 10,
   },
   topBar: {
     flexDirection: "row",

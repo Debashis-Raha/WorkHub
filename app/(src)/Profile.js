@@ -10,6 +10,7 @@ import { useNavigation } from "expo-router";
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [profilePic, setProfilePic] = useState(null);
+  const [imageLoading, setImageLoading] = useState(false);
   const route = useRoute();
  
   const navigation = useNavigation();
@@ -34,7 +35,7 @@ const Profile = () => {
 
   const uploadProfilePic = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images', 'videos'],
+      mediaTypes: ImagePicker.MediaType.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -42,6 +43,7 @@ const Profile = () => {
 
     if (!result.cancelled) {
       const { uri } = result;
+      setImageLoading(true); // Start loading
       const response = await fetch(uri);
       const blob = await response.blob();
       const uid = user.uid;
@@ -51,9 +53,11 @@ const Profile = () => {
         const snapshot = await uploadBytes(profilePicRef, blob);
         const downloadURL = await getDownloadURL(snapshot.ref);
         setProfilePic(downloadURL);
+        setImageLoading(false); // Stop loading
         Alert.alert('Success', 'Profile picture uploaded successfully!');
       } catch (error) {
         console.log('Error uploading profile picture:', error);
+        setImageLoading(false); // Stop loading
         Alert.alert('Error', 'Failed to upload profile picture');
       }
     }
@@ -83,10 +87,16 @@ const Profile = () => {
   return (
     <View style={styles.container}>
       <Text>Welcome, {user.displayName || user.email}</Text>
-      {profilePic ? (
-        <Image source={{ uri: profilePic }} style={styles.profilePic} />
+      {imageLoading ? (
+        <Text>Loading image...</Text>
       ) : (
-        <Text>No profile picture</Text>
+        <>
+          {profilePic ? (
+            <Image source={{ uri: profilePic }} style={styles.profilePic} />
+          ) : (
+            <Text>No profile picture</Text>
+          )}
+        </>
       )}
       <Button title="Upload Profile Picture" onPress={uploadProfilePic} />
       <FAB

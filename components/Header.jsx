@@ -1,17 +1,13 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  StatusBar,
-} from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
-const Header = ({ title, onBackPress, rightComponent, style }) => {
+const Header = ({ title, onBackPress, style }) => {
+  const navigation = useNavigation();
+
   return (
     <>
-      {/* Add StatusBar with a matching background color */}
       <StatusBar backgroundColor="#007BFF" barStyle="light-content" />
 
       <View style={[styles.container, style]}>
@@ -23,9 +19,12 @@ const Header = ({ title, onBackPress, rightComponent, style }) => {
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
           {title}
         </Text>
-        {rightComponent && (
-          <View style={styles.rightComponent}>{rightComponent}</View>
-        )}
+        <TouchableOpacity
+          onPress={() => navigation.navigate('(src)/Profile')}
+          style={styles.profileButton}
+        >
+          <Ionicons name="person" size={24} color="white" />
+        </TouchableOpacity>
       </View>
     </>
   );
@@ -48,7 +47,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   backButton: {
-    marginRight: 10,
+    position: 'absolute',
+    left: 10,
+    top: '50%',
+    transform: [{ translateY: -12 }],
+    backgroundColor: "rgba(0, 0, 0, 0.2)", // Background color for visibility
     padding: 5,
     borderRadius: 50,
   },
@@ -58,8 +61,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     textAlign: "center",
+    marginLeft: 50, // Adjust to ensure the title is centered properly
   },
-  rightComponent: {
-    marginLeft: 10,
+  profileButton: {
+    padding: 5,
+    borderRadius: 50,
   },
 });

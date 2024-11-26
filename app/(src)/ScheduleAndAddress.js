@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Platform, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Platform, TextInput, TouchableOpacity, Alert } from 'react-native';
 import React, { useState } from 'react';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Header from '../../components/Header';
@@ -42,6 +42,17 @@ const ScheduleAndAddress = () => {
     const handleTimeConfirm = (time) => {
         setSelectedTime(time);
         hideTimePicker();
+    };
+
+    const SendRequest =()=>{
+        const [isLoading, setLoading] = useState(false);
+    };
+
+    const handleRequest =()=>{
+        setLoading(true);
+        setTimeout(()=>{
+        Alert.alert("Sent");
+        navigation.navigate('(src)/Profile');},2000); //2 seconds
     };
 
     return (
@@ -98,7 +109,7 @@ const ScheduleAndAddress = () => {
                 />
                 <TouchableOpacity style={styles.payment}>
 
-                    <Text  style={styles.doneButtonText} onPress={()=>navigation.navigate('(src)/Profile')}>
+                    <Text  style={styles.doneButtonText} onPress={handleRequest}>
                         Send Request
                     </Text>
                 </TouchableOpacity>
