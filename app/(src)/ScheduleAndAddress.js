@@ -1,10 +1,9 @@
-import { StyleSheet, Text, View, Platform, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, Platform, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import React, { useState } from 'react';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Header from '../../components/Header';
 import { useRoute } from '@react-navigation/native';
 import { useNavigation } from 'expo-router';
-
 
 const ScheduleAndAddress = () => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -12,11 +11,11 @@ const ScheduleAndAddress = () => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
     const [address, setAddress] = useState("");
-    const route = useRoute()
+    const [isLoading, setIsLoading] = useState(false); // State for the loader
+
+    const route = useRoute();
     const { item } = route.params;
-    const navigation=useNavigation()
-    
-   
+    const navigation = useNavigation();
 
     const showDatePicker = () => {
         setDatePickerVisibility(true);
@@ -44,22 +43,32 @@ const ScheduleAndAddress = () => {
         hideTimePicker();
     };
 
-    const SendRequest =()=>{
-        const [isLoading, setLoading] = useState(false);
-    };
+    const handleRequest = () => {
+        if (!selectedDate || !selectedTime || !item.name) {
+            Alert.alert("Error", "Please select a date, time, and worker.");
+            return;
+        }
 
-    const handleRequest =()=>{
-        setLoading(true);
-        setTimeout(()=>{
-        Alert.alert("Sent");
-        navigation.navigate('(src)/Profile');},2000); //2 seconds
+        setIsLoading(true); // Show loader
+
+        const requestData = {
+            date: selectedDate.toLocaleDateString(),
+            time: selectedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            worker: item.name,
+        };
+
+        setTimeout(() => {
+            setIsLoading(false); // Hide loader
+            Alert.alert("Request Sent", "Your request has been sent successfully!");
+            navigation.navigate('(src)/Profile', { newRequest: requestData });
+        }, 2000); // Simulate a delay of 2 seconds
     };
 
     return (
         <View>
-            <Header/>
-            <View style={styles.container} >
-            <View style={styles.itemDetailsContainer}>
+            <Header />
+            <View style={styles.container}>
+                <View style={styles.itemDetailsContainer}>
                     <Text style={styles.itemName}>{item.name}</Text>
                     <Text style={styles.itemPrice}>Price per Hour: ${item.price}</Text>
                     <Text style={styles.itemTotal}>Total: ${item.total}</Text>
@@ -102,23 +111,23 @@ const ScheduleAndAddress = () => {
                 />
 
                 <TextInput
-                    style={styles.Placeholder} 
+                    style={styles.Placeholder}
                     placeholder='Address'
                     value={address}
                     onChangeText={(text) => setAddress(text)}
                 />
-                <TouchableOpacity style={styles.payment}>
 
-                    <Text  style={styles.doneButtonText} onPress={handleRequest}>
-                        Send Request
-                    </Text>
+                <TouchableOpacity style={styles.payment} onPress={handleRequest} disabled={isLoading}>
+                    {isLoading ? (
+                        <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                        <Text style={styles.doneButtonText}>Send Request</Text>
+                    )}
                 </TouchableOpacity>
-                
-               
             </View>
         </View>
     );
-}
+};
 
 export default ScheduleAndAddress;
 
@@ -138,16 +147,17 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 20,
     },
-    payment:{
+    payment: {
         backgroundColor: '#007FFF',
         paddingVertical: 15,
         borderRadius: 5,
-        
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     doneButtonText: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#FFFFFF',
         textAlign: 'center',
-    }
+    },
 });

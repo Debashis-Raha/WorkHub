@@ -13,28 +13,6 @@ import { useNavigation } from "expo-router";
 import Header from "../../components/Header";
 
 const ProfileScreen = () => {
-  const profilePictureUrl =
-    "https://th-i.thgim.com/public/news/national/tamil-nadu/48223l/article37131621.ece/alternates/FREE_1200/Vivekh"; // Replace with your profile image link
-  const highlights = [
-    { id: 1, image: profilePictureUrl, label: "😊✨" },
-    { id: 2, image: profilePictureUrl, label: "Fit" },
-    { id: 3, image: profilePictureUrl, label: "Cinematic" },
-    { id: 4, image: profilePictureUrl, label: "New" },
-  ];
-
-  const posts = [
-    { id: 1, image: profilePictureUrl },
-    { id: 2, image: profilePictureUrl },
-    { id: 3, image: profilePictureUrl },
-    { id: 4, image: profilePictureUrl },
-    { id: 5, image: profilePictureUrl },
-    { id: 6, image: profilePictureUrl },
-    { id: 7, image: profilePictureUrl },
-    { id: 8, image: profilePictureUrl },
-    { id: 9, image: profilePictureUrl },
-    { id: 10, image: profilePictureUrl },
-  ];
-
   const route = useRoute();
   const { item } = route.params;
   const navigation = useNavigation();
@@ -42,21 +20,21 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       {/* Top Bar */}
-      <Header title=''/>
-      <View style={styles.topBar}>
-        <Text style={styles.username}>{item.UserName}</Text>
-      </View>
+      <Header title="" />
 
       {/* Profile Info */}
       <View style={styles.profileInfo}>
-        <Image style={styles.profilePic} source={{ uri: profilePictureUrl }} />
+      <Image 
+    style={styles.profilePic} 
+    source={{ uri: item.avatarUrl || "https://via.placeholder.com/80" }} // Fallback URL
+  />
         <View style={styles.profileStats}>
-          <Text style={styles.statNumber}>22</Text>
-          <Text style={styles.statLabel}>Reviews</Text>
+        <Text style={styles.statNumber}>{item.review_image.length}</Text>
+        <Text style={styles.statLabel}>Reviews</Text>
         </View>
         <View style={styles.profileStats}>
-          <Text style={styles.statNumber}>835</Text>
-          <Text style={styles.statLabel}>Work</Text>
+        <Text style={styles.statNumber}>{item.workdone}</Text>
+        <Text style={styles.statLabel}>Work</Text>
         </View>
         <View style={styles.profileStats}>
           <Text style={styles.statNumber}>{item.experience}</Text>
@@ -66,6 +44,10 @@ const ProfileScreen = () => {
 
       {/* Profile Name and Bio */}
       <View style={styles.bioSection}>
+
+        <Text style={styles.username}>{item.UserName}</Text>
+
+
         <Text style={styles.name}>{item.description}</Text>
       </View>
 
@@ -81,13 +63,13 @@ const ProfileScreen = () => {
 
       {/* Highlights */}
       <ScrollView horizontal style={styles.highlights}>
-        {highlights.map((highlight) => (
-          <View key={highlight.id} style={styles.highlight}>
+        {item.highlightimage?.map((highlight, index) => (
+          <View key={index} style={styles.highlight}>
             <Image
               style={styles.highlightImage}
-              source={{ uri: highlight.image }}
+              source={{ uri: highlight || "https://via.placeholder.com/60" }} // Fallback URL
             />
-            <Text style={styles.highlightText}>{highlight.label}</Text>
+            <Text style={styles.highlightText}>Highlight {index + 1}</Text>
           </View>
         ))}
         <View style={styles.highlight}>
@@ -99,16 +81,17 @@ const ProfileScreen = () => {
       {/* Posts Section */}
       <ScrollView contentContainerStyle={{ marginBottom: -50 }}>
         <Text style={styles.sectionTitle}>Reviews</Text>
-        <ScrollView contentContainerStyle={styles.postGrid}>
-          {posts.map((post) => (
+        <View style={styles.postGrid}>
+          {item.review_image?.map((review, index) => (
             <Image
-              key={post.id}
+              key={index}
               style={styles.postImage}
-              source={{ uri: post.image }}
+              source={{ uri: review || "https://via.placeholder.com/120" }} // Fallback URL
             />
           ))}
-        </ScrollView>
+        </View>
       </ScrollView>
+
       {/* Proceed Button */}
       <TouchableOpacity
         style={styles.proceedButton}
@@ -126,7 +109,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    // paddingTop: 10,
   },
   topBar: {
     flexDirection: "row",
