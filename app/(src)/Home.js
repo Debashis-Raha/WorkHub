@@ -23,14 +23,16 @@ const Home = () => {
 
   const filterProfessionals = (query, category) => {
     const filtered = data.professionals.filter((professional) => {
-      const matchesQuery = professional.name.toLowerCase().includes(query.toLowerCase());
+      const matchesQuery =
+        professional.name.toLowerCase().includes(query.toLowerCase()) ||
+        professional.category.toLowerCase().includes(query.toLowerCase());
       const matchesCategory = category ? professional.category === category : true;
       return matchesQuery && matchesCategory;
     });
     setFilteredProfessionals(filtered);
   };
 
-  const categories = Array.from(new Set(data.professionals.map(p => p.category)));
+  const categories = Array.from(new Set(data.professionals.map((p) => p.category)));
 
   return (
     <View style={styles.container}>
@@ -38,7 +40,7 @@ const Home = () => {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchBar}
-          placeholder="Search"
+          placeholder="Search by name or category"
           value={searchQuery}
           onChangeText={handleSearch}
         />
@@ -49,7 +51,11 @@ const Home = () => {
           style={styles.searchIcon}
         />
       </View>
-      <ScrollView horizontal style={styles.categoryContainer} contentContainerStyle={styles.categoryContent}>
+      <ScrollView
+        horizontal
+        style={styles.categoryContainer}
+        contentContainerStyle={styles.categoryContent}
+      >
         <TouchableOpacity
           style={[styles.categoryButton, !selectedCategory && styles.selectedCategory]}
           onPress={() => handleCategoryChange("")}
@@ -59,7 +65,10 @@ const Home = () => {
         {categories.map((category, index) => (
           <TouchableOpacity
             key={index}
-            style={[styles.categoryButton, selectedCategory === category && styles.selectedCategory]}
+            style={[
+              styles.categoryButton,
+              selectedCategory === category && styles.selectedCategory,
+            ]}
             onPress={() => handleCategoryChange(category)}
           >
             <Text style={styles.categoryButtonText}>{category}</Text>
@@ -75,7 +84,7 @@ const Home = () => {
           >
             <Image
               source={{
-                uri: item.avatarUrl || "https://via.placeholder.com/150", // Placeholder image for missing URLs
+                uri: item.avatarUrl || "https://via.placeholder.com/150",
               }}
               style={styles.image}
               resizeMode="cover"
@@ -115,11 +124,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    paddingRight: 40, // Add padding to the right to avoid overlap with the icon
+    paddingRight: 40,
   },
   searchIcon: {
     position: "absolute",
-    right: 10, // Adjusted to bring it closer to the TextInput
+    right: 10,
     top: "50%",
     transform: [{ translateY: -12 }],
   },
@@ -133,8 +142,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   categoryButton: {
-    paddingVertical: 5, // Reduced vertical padding
-    paddingHorizontal: 10, // Reduced horizontal padding
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     backgroundColor: "#e0e0e0",
     borderRadius: 20,
     marginRight: 10,
@@ -144,7 +153,7 @@ const styles = StyleSheet.create({
   },
   categoryButtonText: {
     color: "#333",
-    fontSize: 12, // Reduced font size for a tighter look
+    fontSize: 12,
   },
   scrollView: {
     paddingVertical: 10,

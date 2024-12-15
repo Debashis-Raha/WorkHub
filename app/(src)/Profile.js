@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Button, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, Image, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { auth, storage } from './../../configs/FirebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
 import { FAB } from 'react-native-paper';
@@ -27,11 +27,27 @@ const Profile = () => {
 
   useEffect(() => {
     if (route.params?.newRequest) {
+      const newRequest = { ...route.params.newRequest, status: 'Pending' };
       setRequests((prevRequests) => {
-        const updatedRequests = [route.params.newRequest, ...prevRequests];
+        const updatedRequests = [newRequest, ...prevRequests];
         saveRequests(updatedRequests);
         return updatedRequests;
       });
+
+      // Timer to update status to 'Accepted'
+      const timer = setTimeout(() => {
+        setRequests((prevRequests) => {
+          const updatedRequests = prevRequests.map((req) =>
+            req === newRequest && req.status === 'Pending'
+              ? { ...req, status: 'Accepted' }
+              : req
+          );
+          saveRequests(updatedRequests);
+          return updatedRequests;
+        });
+      }, 5000);
+
+      return () => clearTimeout(timer); // Cleanup timer
     }
   }, [route.params?.newRequest]);
 
@@ -96,7 +112,7 @@ const Profile = () => {
   };
 
   const navigateToHome = () => {
-    navigation.navigate("(src)/Home"); // navigate to home
+    navigation.navigate('(src)/Home'); // Navigate to home
   };
 
   const saveRequests = async (requests) => {
@@ -142,7 +158,7 @@ const Profile = () => {
         />
       )}
       <Button title="Upload Profile Picture" onPress={uploadProfilePic} />
-      
+
       <Text style={styles.requestsHeading}>Scheduled Requests:</Text>
       <ScrollView style={styles.requestsContainer}>
         {requests.length === 0 ? (
@@ -150,9 +166,26 @@ const Profile = () => {
         ) : (
           requests.map((request, index) => (
             <View key={index} style={styles.requestItem}>
-              <Text style={styles.requestText}>Date: {request.date}</Text>
-              <Text style={styles.requestText}>Time: {request.time}</Text>
-              <Text style={styles.requestText}>Worker: {request.worker}</Text>
+              <View style={styles.requestDetails}>
+                <Text style={styles.requestText}>Date: {request.date}</Text>
+                <Text style={styles.requestText}>Time: {request.time}</Text>
+                <Text style={styles.requestText}>Worker: {request.worker}</Text>
+              </View>
+              <TouchableOpacity
+                style={[
+                  styles.requestButton,
+                  {
+                    backgroundColor:
+                      request.status === 'Accepted' ? 'green' : 'red',
+                  },
+                ]}
+              >
+                <Text style={styles.requestButtonText}>
+                  {request.status === 'Accepted'
+                    ? 'Accepted'
+                    : 'Pending'}
+                </Text>
+              </TouchableOpacity>
             </View>
           ))
         )}
@@ -218,6 +251,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   requestItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 10,
     padding: 10,
     backgroundColor: '#f8f8f8',
@@ -225,9 +260,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
   },
+  requestDetails: {
+    flex: 1,
+  },
   requestText: {
     fontSize: 16,
     color: '#333',
+  },
+  requestButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginLeft: 10,
+    height: 30,
+    width: 100,
+  },
+  requestButtonText: {
+    color: 'white',
+    fontSize: 12,
   },
   fabLogout: {
     position: 'absolute',
